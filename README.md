@@ -1,2 +1,1 @@
-# dengu_prediction
-DSR_group_project
+This project uses python 3.13
