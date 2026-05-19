@@ -5,11 +5,12 @@ Runs the full pipeline top to bottom.
 
     python main.py
 
-Outputs:
-    predictions.csv   — submission ready to upload to DrivenData
-    report.html       — EDA plots for preliminary investigation
+Outputs (written to the output/ folder):
+    output/predictions.csv   — submission ready to upload to DrivenData
+    output/report.html       — EDA plots for preliminary investigation
 """
 
+import os
 import pandas as pd
 from src.data_loader import load_data
 from src.cleaning    import clean
@@ -17,8 +18,12 @@ from src.features    import build_features, get_feature_cols
 from src.models      import train_model, predict
 from src.report      import generate_report
 
+OUTPUT_DIR = "output"
+
 
 def run():
+
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     # ── 1. Load ───────────────────────────────────────────────────────────────
     print("Loading data...")
@@ -27,7 +32,7 @@ def run():
 
     # ── 2. EDA report (on raw data, before any cleaning) ─────────────────────
     print("Generating EDA report...")
-    generate_report(df, output_path="report.html")
+    generate_report(df, output_path=f"{OUTPUT_DIR}/report.html")
 
     # ── 3. Clean ──────────────────────────────────────────────────────────────
     print("Cleaning...")
@@ -66,8 +71,8 @@ def run():
 
     # ── 6. Save submission ────────────────────────────────────────────────────
     submission = pd.concat(all_preds, ignore_index=True)
-    submission.to_csv("predictions.csv", index=False)
-    print(f"\nSubmission saved: predictions.csv  ({len(submission)} rows)")
+    submission.to_csv(f"{OUTPUT_DIR}/predictions.csv", index=False)
+    print(f"\nSubmission saved: {OUTPUT_DIR}/predictions.csv  ({len(submission)} rows)")
 
 
 if __name__ == "__main__":

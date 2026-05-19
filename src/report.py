@@ -43,7 +43,7 @@ def plot_missing_values(df):
     ax.set_title("Missing Value Rate per Column (%)", fontweight="bold")
     ax.set_ylabel("% missing")
     ax.set_xlabel("")
-    ax.tick_params(axis="x", rotation=45)
+    ax.tick_params(axis="x", rotation=90)
     plt.tight_layout()
     return fig
 
@@ -56,16 +56,26 @@ def plot_cases_over_time(df):
 
     fig, axes = plt.subplots(2, 1, figsize=(12, 6), sharex=False)
     for ax, (city_code, city_name) in zip(axes, cities.items()):
-        subset = train[train["city"] == city_code]["total_cases"].values
-        ax.fill_between(range(len(subset)), subset, alpha=0.2, color=colors[city_code])
-        ax.plot(subset, color=colors[city_code], linewidth=0.9)
-        ax.axhline(subset.mean(), color="grey", linestyle="--", linewidth=1,
-                   label=f"Mean = {subset.mean():.0f}")
+        city_train = train[train["city"] == city_code].reset_index(drop=True)
+        cases      = city_train["total_cases"].values
+        x          = range(len(cases))
+
+        ax.fill_between(x, cases, alpha=0.2, color=colors[city_code])
+        ax.plot(x, cases, color=colors[city_code], linewidth=0.9)
+        ax.axhline(cases.mean(), color="grey", linestyle="--", linewidth=1,
+                   label=f"Mean = {cases.mean():.0f}")
         ax.set_title(f"{city_name} — Weekly Dengue Cases", fontweight="bold")
         ax.set_ylabel("Cases")
         ax.legend()
 
-    axes[1].set_xlabel("Week number")
+        # Place one x-tick at the first week of each year
+        year_col    = city_train["year"].values
+        tick_pos    = [i for i in range(len(year_col))
+                       if i == 0 or year_col[i] != year_col[i - 1]]
+        tick_labels = [str(year_col[i]) for i in tick_pos]
+        ax.set_xticks(tick_pos)
+        ax.set_xticklabels(tick_labels, rotation=90, fontsize=8)
+
     plt.tight_layout()
     return fig
 
