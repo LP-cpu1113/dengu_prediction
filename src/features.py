@@ -9,8 +9,6 @@ To add a new feature:
   3. Call the function inside build_features().
 """
 
-import numpy as np
-
 # ── Lag windows ───────────────────────────────────────────────────────────────
 
 LAGS = list(range(1, 9))   # [1, 2, 3, 4, 5, 6, 7, 8] weeks — applied to all signals
@@ -58,11 +56,13 @@ FEATURE_COLS = [
     *[f"specific_humidity_roll4_lag{l}" for l in LAGS],
 ]
 
+# Expected total: 3 + 13 + 18 + 19 + 18 + 18 + 18 + 18 = 125
+
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _rolling(df, col, window):
-    """Per-city rolling mean. min_periods=1 so the first rows use partial windows."""
+    """Per-city rolling mean. min_periods=1 so first rows use partial windows."""
     return (
         df.groupby("city")[col]
         .transform(lambda s: s.rolling(window, min_periods=1).mean())
